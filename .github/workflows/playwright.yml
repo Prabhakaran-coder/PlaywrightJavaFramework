@@ -4,6 +4,29 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
+  workflow_dispatch:
+      inputs:
+        browser:
+          description: 'Browser to run tests on (chrome, firefox, safari)'
+          required: true
+          default: 'chrome'
+          type: choice
+          options:
+            - chrome
+            - firefox
+            - safari
+        envronment:
+          description: 'Browser to run tests against'
+          required: true
+          default: 'chrome'
+          type: choice
+          options:
+            - qa
+            - prod
+            - dev
+
+
 jobs:
   test:
     timeout-minutes: 60
@@ -19,4 +42,4 @@ jobs:
     - name: Ensure browsers are installed
       run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
     - name: Run tests
-      run: mvn test -PSmoke -Dbrowser=chrome
+      run: mvn test -PSmoke -Dbrowser=${{ github.event.inputs.browser }} -Denv=${{ github.event.inputs.envronment }}
